@@ -1,19 +1,69 @@
-import React from "react";
-import { Link } from "react-router-dom";
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import logo from "../assets/logo.svg";
-
-const handleSubmit = (e) => {
-  e.preventDefault();
-  alert("submitted");
-};
-
-const handleChange = (e) => {
-
-}
-
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import axios from "axios";
+import { registerRoute } from "../utils/APIRoutes.js";
 
 const Register = () => {
+  const [values, setValues] = useState({
+    username: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+  });
+
+  const navigate = useNavigate();
+
+  const toastOptions = {
+    position: "bottom-right",
+    autoClose: 8000,
+    pauseOnHover: true,
+    draggable: true,
+    theme: "dark",
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const bool = handleValidation();
+    if (bool) {
+      const { username, email, password } = values;
+      const { data } = await axios.post(registerRoute, {
+        username,
+        email,
+        password,
+      });
+      if (data.success) {
+        toast.success(data.message, toastOptions);
+        localStorage.setItem("user", JSON.stringify(data.user));
+        navigate("/");
+      } else {
+        console.log(data.message)
+        toast.error(data.message, toastOptions);
+      }
+    }
+  };
+
+  const handleValidation = () => {
+    const { username, password, confirmPassword, email } = values;
+    if (password !== confirmPassword) {
+      toast.error("Password and Confirm Password should be same", toastOptions);
+      return false;
+    } else if (username.length < 3) {
+      toast.error("Username should be atleast 3 characters", toastOptions);
+      return false;
+    } else if (password.length < 6) {
+      toast.error("Password should be atleast 8 characters", toastOptions);
+      return false;
+    }
+    return true;
+  };
+
+  const handleChange = (e) => {
+    setValues({ ...values, [e.target.name]: e.target.value });
+  };
   return (
     <>
       <FormContainer>
@@ -52,6 +102,7 @@ const Register = () => {
           </span>
         </form>
       </FormContainer>
+      <ToastContainer />
     </>
   );
 };
