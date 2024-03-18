@@ -21,3 +21,5 @@ export const register = async (req, res) => {
   delete user.password;
   return res.status(201).json({message:'user Created Successfully', success: true,user });
 };
+
+export const login = async (req, res) => {}
