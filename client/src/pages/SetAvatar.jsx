@@ -4,6 +4,7 @@ const SetAvatar = () => {
   return (
     <div>
       Setavatar
+      r
     </div>
   )
 }
